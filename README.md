@@ -1,4 +1,4 @@
-# # Vector Quantization
+# Vector Quantization
 
 Lossy grayscale image compression and decompression using **Vector Quantization (VQ)** with the **LBG** codebook algorithm, written in Python.
 
