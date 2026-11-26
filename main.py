@@ -7,9 +7,8 @@ from io_utils import (
 from compression import (
     vq_compression,
     vq_decompression,
-    compression_ratio
+    calculate_compression_ratio
 )
-
 
 def run_app():
     print(
@@ -22,7 +21,7 @@ def run_app():
     while True:
         print(
             "\n┌─────────────────────────┐"
-            "\n│  [ Vector Quantization ]│"
+            "\n│ [ Vector Quantization ] │"
             "\n├─────────────────────────┤"
             "\n│  [1]  Compression       │"
             "\n│  [2]  Decompression     │"
@@ -34,24 +33,24 @@ def run_app():
             choice = int(input("Please enter your choice: "))
 
             if choice == 1:
-                filename = input("Please enter image name: ").strip()
-                img = read_image(filename)
+                filename = input("Please enter image name (with extension): ").strip()
+                image = read_image(filename)
 
-                if img is None:
+                if image is None:
                     print("File not found please enter a valid file name.")
                 else:
-                    bh = int(input("Block height: "))
-                    bw = int(input("Block width: "))
-                    k = int(input("Codebook size (number of vectors): "))
+                    block_h = int(input("Please enter block height: "))
+                    block_w = int(input("Please enter block width: "))
+                    codebook_size = int(input("Please enter codebook size: "))
 
-                    bitstream, metadata = vq_compression(img, bh, bw, k)
+                    bitstream, metadata = vq_compression(image, block_h, block_w, codebook_size)
                     newname = input("Enter new file name: ").strip()
                     write_vq_compressed(bitstream, metadata, newname)
 
                     print("File created successfully!")
                     print("Compressed file:", newname + ".bin")
-                    print("Codebook file:", newname + "_codebook.json")
-                    print(f"Compression ratio: {compression_ratio(metadata):.2f}")
+                    print("Codebook file:", newname + "_codebook.txt")
+                    print(f"Compression ratio: {calculate_compression_ratio(metadata):.2f}")
 
             elif choice == 2:
                 filename = input("Please enter compressed file name: ").strip()
@@ -60,10 +59,11 @@ def run_app():
                 if bitstream is None or metadata is None:
                     print("File not found please enter a valid file name.")
                 else:
-                    img = vq_decompression(bitstream, metadata)
-                    newname = input("Enter new image name (e.g. out.png): ").strip()
-                    write_image(img, newname)
+                    image = vq_decompression(bitstream, metadata)
+                    newname = input("Enter new image name: ").strip()
+                    write_image(image, newname)
                     print("Image decompressed successfully!")
+                    print("Image file:", newname + ".png")
 
             elif choice == 0:
                 print("\nGoodbye!")
@@ -74,7 +74,6 @@ def run_app():
 
         except (ValueError, SyntaxError, KeyError, TypeError) as e:
             print(f"Error: {e}")
-
 
 if __name__ == "__main__":
     run_app()
